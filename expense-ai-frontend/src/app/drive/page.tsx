@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, CheckCircle2, File, Folder, FolderOpen, Grid3X3, LayoutList, Loader2, LogOut, Search, WifiOff } from 'lucide-react';
+import { Activity, ChevronRight, CheckCircle2, File, Folder, FolderOpen, Grid3X3, LayoutList, Loader2, LogOut, RefreshCw, Search, WifiOff } from 'lucide-react';
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { driveService } from '../../services/driveService';
@@ -44,6 +44,45 @@ function summarizeTree(items: DriveItem[]) {
 
 const GREETINGS = ['Good day, admin', 'Welcome back, admin', 'Hello, admin'];
 
+const FOLDER_COLORS = [
+  'rgba(245, 166, 35, 0.14)',
+  'rgba(4, 98, 65, 0.10)',
+  'rgba(88, 86, 214, 0.10)',
+  'rgba(255, 59, 48, 0.08)',
+  'rgba(0, 122, 255, 0.10)',
+  'rgba(255, 149, 0, 0.10)',
+];
+
+const FOLDER_ICON_COLORS = [
+  '#f5a623',
+  '#046241',
+  '#5856d6',
+  '#ff3b30',
+  '#007aff',
+  '#ff9500',
+];
+
+function formatRelativeDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays === 0) return 'Updated today';
+  if (diffDays === 1) return 'Updated yesterday';
+  if (diffDays < 7) return `Updated ${diffDays}d ago`;
+  return `Updated ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+}
+
+function countDeepFiles(items: DriveItem[]): number {
+  let count = 0;
+  for (const item of items) {
+    if (!isFolder(item)) count += 1;
+    if (item.children?.length) count += countDeepFiles(item.children);
+  }
+  return count;
+}
+
 function useCyclingGreeting(intervalMs: number) {
   const [index, setIndex] = useState(0);
   const [animClass, setAnimClass] = useState('splitIn');
@@ -70,6 +109,8 @@ export default function DrivePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const { greeting, animClass } = useCyclingGreeting(15000);
 
   const deferredSearch = useDeferredValue(searchInput.trim().toLowerCase());
@@ -84,6 +125,7 @@ export default function DrivePage() {
         const data = await driveService.listFiles();
         setFolders(data);
         setError(null);
+        setLastSynced(new Date());
       } catch (err) {
         setError('Failed to load scanned Google Drive folders.');
         console.error(err);
@@ -96,6 +138,20 @@ export default function DrivePage() {
   }, []);
 
   const stats = summarizeTree(folders);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      const data = await driveService.listFiles();
+      setFolders(data);
+      setLastSynced(new Date());
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   const rootFolders = useMemo(() => {
     if (!deferredSearch) return folders;
     return folders.filter((folder) => folder.name.toLowerCase().includes(deferredSearch));
@@ -151,6 +207,7 @@ export default function DrivePage() {
 
       <section className={styles.hero}>
         <div className={styles.heroCard}>
+          <div className={styles.heroCardGrid} />
           <div className={styles.heroTicker} aria-label="Always on never off">
             <div className={styles.heroTickerTrack}>
               <span>Always On Never Off • Always On Never Off • Always On Never Off • Always On Never Off •</span>
@@ -161,22 +218,51 @@ export default function DrivePage() {
             {greeting}
           </h1>
           <p className={styles.heroSubtitle}>Select a scanned expense folder below to open its review workspace.</p>
+          <div className={styles.heroMeta}>
+            <span className={styles.heroDate}>
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </span>
+            {lastSynced && (
+              <span className={styles.heroSync}>
+                <Activity size={12} />
+                Last synced {lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </div>
         </div>
         <div className={styles.heroMetrics}>
-          <article className={styles.metricCard}>
-            <FolderOpen className={styles.metricIcon} size={18} />
+          <article className={`${styles.metricCard} ${styles.metricCardGreen}`}>
+            <div className={styles.metricHeader}>
+              <FolderOpen className={styles.metricIcon} size={18} />
+              <span className={styles.metricBadge}>{folders.length > 0 ? 'Active' : 'Empty'}</span>
+            </div>
             <span>Top-level scans</span>
             <strong>{folders.length}</strong>
+            <div className={styles.metricBar}>
+              <div className={styles.metricBarFillGreen} style={{ width: `${Math.min(folders.length * 10, 100)}%` }} />
+            </div>
           </article>
-          <article className={styles.metricCard}>
-            <Folder className={styles.metricIcon} size={18} />
+          <article className={`${styles.metricCard} ${styles.metricCardAmber}`}>
+            <div className={styles.metricHeader}>
+              <Folder className={styles.metricIcon} size={18} />
+              <span className={styles.metricBadge}>{stats.folderCount} total</span>
+            </div>
             <span>Nested folders</span>
             <strong>{stats.folderCount}</strong>
+            <div className={styles.metricBar}>
+              <div className={styles.metricBarFillAmber} style={{ width: `${Math.min(stats.folderCount * 5, 100)}%` }} />
+            </div>
           </article>
-          <article className={styles.metricCard}>
-            <File className={styles.metricIcon} size={18} />
+          <article className={`${styles.metricCard} ${styles.metricCardBlue}`}>
+            <div className={styles.metricHeader}>
+              <File className={styles.metricIcon} size={18} />
+              <span className={styles.metricBadge}>{stats.fileCount} indexed</span>
+            </div>
             <span>Files indexed</span>
             <strong>{stats.fileCount}</strong>
+            <div className={styles.metricBar}>
+              <div className={styles.metricBarFillBlue} style={{ width: `${Math.min(stats.fileCount * 3, 100)}%` }} />
+            </div>
           </article>
         </div>
       </section>
@@ -194,6 +280,15 @@ export default function DrivePage() {
           <p>{rootFolders.length} folder{rootFolders.length !== 1 ? 's' : ''} available</p>
         </div>
         <div className={styles.controlActions}>
+          <button
+            className={styles.refreshButton}
+            onClick={handleRefresh}
+            disabled={refreshing}
+            type="button"
+            aria-label="Refresh folders"
+          >
+            <RefreshCw size={14} className={refreshing ? styles.spinSlow : ''} />
+          </button>
           <label className={styles.searchBox}>
             <Search className={styles.searchIcon} size={15} />
             <input
@@ -226,24 +321,40 @@ export default function DrivePage() {
 
       {viewMode === 'tiles' ? (
         <section className={styles.folderGrid}>
-          {rootFolders.map((folder, i) => (
-            <button
-              className={styles.folderCard}
-              key={folder.id}
-              onClick={() => openFolder(folder.id)}
-              type="button"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              <span className={styles.folderIcon}><Folder size={20} /></span>
-              <h3>{folder.name}</h3>
-              <p>{folder.children?.length ?? 0} items</p>
-              <span className={styles.folderLink}>Open <ChevronRight size={14} /></span>
-            </button>
-          ))}
+          {rootFolders.map((folder, i) => {
+            const childCount = folder.children?.length ?? 0;
+            const deepFiles = countDeepFiles(folder.children ?? []);
+            const colorIdx = i % FOLDER_COLORS.length;
+            return (
+              <button
+                className={styles.folderCard}
+                key={folder.id}
+                onClick={() => openFolder(folder.id)}
+                type="button"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className={styles.folderCardTop}>
+                  <span className={styles.folderIcon} style={{ background: FOLDER_COLORS[colorIdx] }}>
+                    <Folder size={20} style={{ color: FOLDER_ICON_COLORS[colorIdx] }} />
+                  </span>
+                  <span className={styles.folderItemCount}>{childCount}</span>
+                </div>
+                <h3>{folder.name}</h3>
+                <p>{childCount} item{childCount !== 1 ? 's' : ''}{deepFiles > 0 ? ` · ${deepFiles} file${deepFiles !== 1 ? 's' : ''}` : ''}</p>
+                {folder.modifiedTime && (
+                  <span className={styles.folderDate}>{formatRelativeDate(folder.modifiedTime)}</span>
+                )}
+                <span className={styles.folderLink}>Open workspace <ChevronRight size={14} /></span>
+              </button>
+            );
+          })}
           {rootFolders.length === 0 && (
             <div className={styles.emptyState}>
-              <Search size={32} />
-              <p>No folders match your search.</p>
+              <div className={styles.emptyStateIcon}>
+                <Search size={28} />
+              </div>
+              <h3>No folders found</h3>
+              <p>{searchInput ? 'Try a different search term.' : 'Connect your Google Drive to get started.'}</p>
             </div>
           )}
         </section>
@@ -266,8 +377,11 @@ export default function DrivePage() {
           ))}
           {rootFolders.length === 0 && (
             <div className={styles.emptyState}>
-              <Search size={32} />
-              <p>No folders match your search.</p>
+              <div className={styles.emptyStateIcon}>
+                <Search size={28} />
+              </div>
+              <h3>No folders found</h3>
+              <p>{searchInput ? 'Try a different search term.' : 'Connect your Google Drive to get started.'}</p>
             </div>
           )}
         </section>

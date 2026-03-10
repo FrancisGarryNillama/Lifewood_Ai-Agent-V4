@@ -135,7 +135,8 @@
   flex-direction: column;
   justify-content: flex-start;
   gap: 0;
-  padding: 18px 24px 20px;
+  min-height: 350px;
+  padding: 22px 28px 24px;
   border-radius: 22px;
   background: var(--dark-serpent);
   color: var(--paper);
@@ -149,6 +150,47 @@
   pointer-events: none;
   border-radius: inherit;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.heroCardGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 70% 60% at 80% 20%, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 80% 20%, black 0%, transparent 70%);
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.heroDate {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.02em;
+}
+
+.heroSync {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.48);
 }
 
 .heroTicker {
@@ -251,6 +293,7 @@
 
 .heroSubtitle {
   max-width: 34ch;
+  margin-bottom: auto;
 }
 
 .heroMetrics {
@@ -263,23 +306,106 @@
   position: relative;
   overflow: hidden;
   min-height: 102px;
-  padding: 14px 14px;
+  padding: 14px 14px 16px;
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .metricCard:hover {
   box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.metricCardGreen {
+  border-left: 3px solid rgba(4, 98, 65, 0.35);
+}
+
+.metricCardGreen:hover {
+  border-left-color: var(--castleton-green);
+}
+
+.metricCardAmber {
+  border-left: 3px solid rgba(245, 166, 35, 0.35);
+}
+
+.metricCardAmber:hover {
+  border-left-color: var(--saffaron);
+}
+
+.metricCardBlue {
+  border-left: 3px solid rgba(0, 122, 255, 0.25);
+}
+
+.metricCardBlue:hover {
+  border-left-color: #007aff;
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.metricBadge {
+  display: inline-flex !important;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  background: rgba(15, 38, 26, 0.06) !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: rgba(15, 38, 26, 0.45) !important;
+  min-height: auto !important;
+}
+
+.metricBar {
+  margin-top: 10px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(15, 38, 26, 0.06);
+  overflow: hidden;
+}
+
+.metricBarFillGreen,
+.metricBarFillAmber,
+.metricBarFillBlue {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.8s var(--ease);
+}
+
+.metricBarFillGreen {
+  background: linear-gradient(90deg, rgba(4, 98, 65, 0.4), var(--castleton-green));
+}
+
+.metricBarFillAmber {
+  background: linear-gradient(90deg, rgba(245, 166, 35, 0.4), var(--saffaron));
+}
+
+.metricBarFillBlue {
+  background: linear-gradient(90deg, rgba(0, 122, 255, 0.3), #007aff);
 }
 
 .metricIcon {
   display: block;
   color: var(--saffaron);
   opacity: 0.95;
-  margin-bottom: 8px;
+}
+
+.metricCardGreen .metricIcon {
+  color: var(--castleton-green);
+}
+
+.metricCardAmber .metricIcon {
+  color: var(--saffaron);
+}
+
+.metricCardBlue .metricIcon {
+  color: #007aff;
 }
 
 .metricCard span {
@@ -370,8 +496,40 @@
 .controlActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-left: auto;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: rgba(15, 38, 26, 0.5);
+  font: inherit;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+}
+
+.refreshButton:hover {
+  color: var(--castleton-green);
+  background: var(--sea-salt);
+  border-color: rgba(4, 98, 65, 0.2);
+  box-shadow: var(--shadow-sm);
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinSlow {
+  animation: spin 1.2s linear infinite;
 }
 
 .searchBox {
@@ -461,17 +619,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 56px 24px;
-  color: rgba(15, 38, 26, 0.35);
-  font-size: 0.9rem;
+  gap: 6px;
+  padding: 64px 24px;
+  color: rgba(15, 38, 26, 0.45);
   text-align: center;
 }
 
-.emptyState svg {
-  width: 40px;
-  height: 40px;
-  stroke-width: 1.2;
+.emptyState h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(15, 38, 26, 0.55);
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(15, 38, 26, 0.38);
+}
+
+.emptyStateIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  border-radius: 16px;
+  background: rgba(15, 38, 26, 0.05);
+  color: rgba(15, 38, 26, 0.3);
+}
+
+.emptyStateIcon svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 1.5;
 }
 
 .folderGrid {
@@ -572,8 +754,8 @@
 .folderCard {
   position: relative;
   overflow: hidden;
-  min-height: 188px;
-  padding: 18px;
+  min-height: 200px;
+  padding: 20px;
   border-radius: var(--radius);
   background: var(--surface-raised);
   color: var(--dark-serpent);
@@ -581,7 +763,7 @@
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: all 0.3s var(--ease);
-  animation: cardEntrance 0.4s var(--ease) both;
+  animation: cardEntrance 0.45s var(--ease) both;
 }
 
 .folderCard::before {
@@ -594,6 +776,34 @@
   background: var(--earth-yellow);
   opacity: 0;
   transition: opacity 0.3s var(--ease);
+}
+
+.folderCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folderItemCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(15, 38, 26, 0.06);
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: rgba(15, 38, 26, 0.45);
+}
+
+.folderDate {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: rgba(15, 38, 26, 0.35);
 }
 
 .folderCard:hover::before,
@@ -612,11 +822,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   background: rgba(245, 166, 35, 0.14);
   color: var(--saffaron);
+  transition: transform 0.3s var(--ease);
+}
+
+.folderCard:hover .folderIcon {
+  transform: scale(1.08);
 }
 
 .folderCard h3,
@@ -1210,7 +1425,8 @@
   }
 
   .heroCard {
-    padding: 16px 14px 16px;
+    min-height: 260px;
+    padding: 18px 16px 20px;
   }
 
   .heroMetrics {
