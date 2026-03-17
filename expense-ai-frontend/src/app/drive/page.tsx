@@ -242,6 +242,12 @@ export default function DrivePage() {
           >
             {greetingContent.description}
           </p>
+          <div className={styles.heroMetaRow}>
+            <span className={styles.heroMetaPill}>AI Workspace Live</span>
+            <span className={styles.heroMetaPill}>
+              {rootFolders.length} review lane{rootFolders.length === 1 ? '' : 's'}
+            </span>
+          </div>
         </div>
         <div className={styles.heroBannerRight}>
           <div className={styles.heroDetailCard}>
