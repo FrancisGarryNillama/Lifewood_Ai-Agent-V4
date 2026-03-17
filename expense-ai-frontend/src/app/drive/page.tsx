@@ -146,9 +146,9 @@ export default function DrivePage() {
     }
 
     return {
-      header: 'Welcome back!',
+      header: 'Welcome back',
       description:
-        'Your Expense AI workspace is active. Continue reviewing scanned receipts and let AI keep your expenses organized in real time.',
+        'Your Expense AI workspace is active. Continue reviewing your scanned receipts and let AI keep your expenses organized in real time.',
     };
   }, [userType]);
 
@@ -159,14 +159,10 @@ export default function DrivePage() {
   if (loading) {
     return (
       <main className={styles.pageShell}>
-        <section className={`${styles.loadingState} ${styles.loadingStateNoAnim}`}>
+        <section className={styles.loadingState}>
+          <Loader2 className={styles.spinner} size={32} />
           <h1>Loading your workspace</h1>
           <p>Syncing scanned folders from Google Drive&hellip;</p>
-          <div className={styles.simpleLoader} aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
         </section>
       </main>
     );
@@ -198,19 +194,21 @@ export default function DrivePage() {
         </a>
 
         {/* ── Centre nav ── */}
-        <nav className={styles.topbarNav} />
+        <nav className={styles.topbarNav}>
+          <a
+            className={styles.navPill}
+            href="https://peaceful-gentleness-production-181e.up.railway.app/dashboard"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <LayoutDashboard className={styles.navIcon} size={14} />
+            <span className={styles.navLabel}>Dashboard</span>
+            <span className={styles.navActiveDot} aria-hidden="true" />
+          </a>
+        </nav>
 
         {/* ── Actions ── */}
         <div className={styles.topbarActions}>
-          <a
-            className={styles.navPill}
-            href="/dashboard"
-          >
-            <LayoutDashboard className={styles.navIcon} size={14} />
-            <span className={styles.navLabel}>AI Dashboard</span>
-            <ArrowRight size={13} className={styles.navIcon} />
-            <span className={styles.navActiveDot} aria-hidden="true" />
-          </a>
           <div className={styles.syncBadge}>
             <span className={styles.syncPulse} aria-hidden="true" />
             <span>{folders.length} folder{folders.length !== 1 ? 's' : ''} synced</span>
@@ -222,14 +220,14 @@ export default function DrivePage() {
         </div>
       </header>
 
-      <div className={styles.pageContent}>
-      <section className={styles.heroBanner}>
-        <div className={styles.heroBannerLeft}>
-          <span className={styles.heroTagline}>
-            <span className={styles.heroTaglineOn}>Always On</span>
-            <span className={styles.heroTaglineDivider}>/</span>
-            <span className={styles.heroTaglineOff}>Never Off</span>
-          </span>
+      <section className={styles.hero}>
+        <div className={styles.heroCard}>
+          <div className={styles.heroTicker} aria-label="Always on never off">
+            <div className={styles.heroTickerTrack}>
+              <span>Always On Never Off • Always On Never Off • Always On Never Off • Always On Never Off •</span>
+              <span aria-hidden="true">Always On Never Off • Always On Never Off • Always On Never Off • Always On Never Off •</span>
+            </div>
+          </div>
           <h1
             className={`${styles.greetingText} ${styles.greetingHeader} ${
               userType === 'new' ? styles.newUserHeaderIn : styles.returningUserHeaderIn
@@ -413,7 +411,6 @@ export default function DrivePage() {
           )}
         </section>
       )}
-      </div>
     </main>
   );
 }
