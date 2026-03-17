@@ -222,14 +222,14 @@ export default function DrivePage() {
         </div>
       </header>
 
-      <section className={styles.hero}>
-        <div className={styles.heroCard}>
-          <div className={styles.heroTicker} aria-label="Always on never off">
-            <div className={styles.heroTickerTrack}>
-              <span>Always On Never Off • Always On Never Off • Always On Never Off • Always On Never Off •</span>
-              <span aria-hidden="true">Always On Never Off • Always On Never Off • Always On Never Off • Always On Never Off •</span>
-            </div>
-          </div>
+      <div className={styles.pageContent}>
+      <section className={styles.heroBanner}>
+        <div className={styles.heroBannerLeft}>
+          <span className={styles.heroTagline}>
+            <span className={styles.heroTaglineOn}>Always On</span>
+            <span className={styles.heroTaglineDivider}>/</span>
+            <span className={styles.heroTaglineOff}>Never Off</span>
+          </span>
           <h1
             className={`${styles.greetingText} ${styles.greetingHeader} ${
               userType === 'new' ? styles.newUserHeaderIn : styles.returningUserHeaderIn
@@ -413,6 +413,7 @@ export default function DrivePage() {
           )}
         </section>
       )}
+      </div>
     </main>
   );
 }
