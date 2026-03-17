@@ -228,6 +228,97 @@
   transform: scale(0.96);
 }
 
+.hero,
+.statsStrip,
+.statusBar,
+.controls,
+.folderGrid,
+.folderList {
+  width: min(1320px, calc(100% - 40px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 310px);
+  gap: 14px;
+  margin-top: 18px;
+  animation: sectionRise 0.45s var(--ease) both;
+}
+
+.heroCard {
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  padding: 24px 26px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 90% 0, rgba(255, 188, 86, 0.26), transparent 40%),
+    radial-gradient(circle at 14% 100%, rgba(18, 92, 59, 0.6), transparent 50%),
+    linear-gradient(132deg, #0d2e20 0%, #0a2017 42%, #103e2b 100%);
+  box-shadow:
+    0 22px 46px rgba(6, 28, 19, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.heroCard::after {
+  content: '';
+  position: absolute;
+  inset: auto -8% -64% auto;
+  width: 52%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.heroTicker {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.heroTickerTrack {
+  display: flex;
+  gap: 42px;
+  width: max-content;
+  padding: 7px 16px;
+  animation: tickerScroll 18s linear infinite;
+}
+
+.heroTicker span {
+  color: rgba(241, 230, 204, 0.92);
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.heroBannerRight {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  animation: sectionRise 0.52s var(--ease) both;
+}
+
+.statsStrip {
+  margin-top: 14px;
+  animation: sectionRise 0.56s var(--ease) both;
+}
+
+.statusBar,
+.controls,
+.folderGrid,
+.folderList {
+  margin-top: 12px;
+  animation: sectionRise 0.6s var(--ease) both;
+}
+
 /* ── Hero banner ── */
 .heroBanner {
   position: relative;
@@ -261,11 +352,12 @@
 }
 
 .heroBannerRight {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  justify-content: stretch;
+  gap: 10px;
+  padding: 0;
   background: transparent;
   min-width: 0;
 }
@@ -449,7 +541,7 @@
   gap: 0;
   max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  margin: 14px auto 0;
   padding: 12px 14px;
   border: 1px solid rgba(15, 38, 26, 0.14);
   border-radius: 18px;
@@ -714,7 +806,7 @@
   gap: 10px;
   max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  margin: 12px auto 0;
   padding: 11px 16px;
   border-radius: var(--radius);
   background:
@@ -747,7 +839,7 @@
   gap: 12px;
   max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  margin: 12px auto 0;
   padding: 16px 16px;
   border: 1px solid rgba(15, 38, 26, 0.14);
   border-radius: 18px;
@@ -912,7 +1004,7 @@
   gap: 14px;
   max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  margin: 12px auto 0;
   flex: 1;
   align-content: start;
   align-items: start;
@@ -923,7 +1015,7 @@
   overflow: hidden;
   max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  margin: 12px auto 0;
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
@@ -2531,6 +2623,17 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes sectionRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
