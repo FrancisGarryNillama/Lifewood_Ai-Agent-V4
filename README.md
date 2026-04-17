@@ -1,106 +1,213 @@
-# Expense AI (monorepo)
+# Expense AI Monorepo
 
-Lightweight monorepo for an expense-tracking AI project containing a Django backend and a Next.js frontend.
+## 📖 Overview
 
-## Repo layout
+Expense AI is a polished full-stack expense management solution designed for finance teams, small businesses, and developers exploring AI-enhanced accounting workflows. The repository combines a Django backend API with a modern Next.js frontend to deliver a secure, scalable, and extensible expense tracking experience.
 
-- `expense-ai-backend/` — Django project (API, server)
-- `expense-ai-frontend/` — Next.js app (React + TypeScript)
+This project emphasizes rapid development, modular architecture, and AI-enabled insights for expense categorization, compliance monitoring, and analytics.
 
-## Prerequisites
+## 🎯 Features
 
-- Node.js 18+ and npm/yarn/pnpm
+- Intelligent expense tracking with AI-supported analysis
+- Responsive web dashboard built with Next.js and React
+- Django REST backend with API-first design
+- Google Drive integration for receipt import and document storage
+- Budget and compliance monitoring endpoints
+- Local development support with SQLite and configurable production-ready persistence
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Role |
+|---|---|---|
+| Backend | Python, Django, Django REST Framework | API, business logic, data persistence |
+| Frontend | Next.js, React, TypeScript | UI, client routing, interactive dashboards |
+| Database | SQLite (development) | lightweight local persistence |
+| Devops | Procfile, `.env` conventions | local service orchestration |
+| Cloud Integrations | Google Drive API | receipt upload and storage automation |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
 - Python 3.8+ and pip
-- (optional) PostgreSQL or other DB if you don't want the default SQLite
+- Git
+- Recommended: Python virtual environment support
 
-## Backend — quick start
+### Installation
 
-1. Open a terminal and go to the backend folder:
+Clone the repository:
+
+```bash
+git clone https://github.com/<your-org>/expense-ai.git
+cd "c:\Users\genpr\Documents\Professional Documents\Lifewood Documents\Lifewood_Ai-Agent-V4"
+```
+
+#### Backend Setup
 
 ```powershell
 cd expense-ai-backend
-```
-
-2. Create and activate a virtual environment, then install dependencies:
-
-```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables (create `.env` or set in your shell). See `expense-ai-backend/.env.example` if present.
+Create or configure environment variables using a `.env` file. Example values may include:
 
-4. Run migrations and start the development server:
+```text
+DJANGO_SECRET_KEY=change-me
+DEBUG=True
+DATABASE_URL=sqlite:///db.sqlite3
+GOOGLE_OAUTH_CREDENTIALS=expense_ai/credentials.json
+```
+
+Run database migrations:
 
 ```powershell
 python manage.py migrate
+```
+
+Launch the backend server:
+
+```powershell
 python manage.py runserver
 ```
 
-By default Django serves at `http://127.0.0.1:8000`.
+The backend API is available at `http://127.0.0.1:8000`.
 
-## Frontend — quick start
-
-1. Open a terminal and go to the frontend folder:
+#### Frontend Setup
 
 ```powershell
-cd expense-ai-frontend
+cd ../expense-ai-frontend
+npm install
 ```
 
-2. Install dependencies and run the dev server:
+Configure frontend environment values as needed in `.env.local` or via environment variables:
+
+```text
+NEXT_PUBLIC_LOCAL_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_REMOTE_API_URL=
+```
+
+Start the Next.js development server:
 
 ```powershell
-npm install
 npm run dev
 ```
 
-The Next.js app runs by default at `http://localhost:3000`.
+The frontend is available at `http://localhost:3000`.
 
-## Running both locally
+### Run Locally
 
-Start the backend first (`8000`) then the frontend (`3000`).
+1. Start the backend service first.
+2. Start the frontend service.
+3. Open the app at `http://localhost:3000`.
 
-The frontend supports both local and remote API endpoints via `expense-ai-frontend/.env.example`:
+## 📂 Project Structure
 
-- `NEXT_PUBLIC_API_URL`: explicit override (highest priority)
-- `NEXT_PUBLIC_LOCAL_API_URL`: local backend endpoint (default `http://localhost:8000`)
-- `NEXT_PUBLIC_REMOTE_API_URL`: deployed backend endpoint fallback
+```text
+.
+├── expense-ai-backend/
+│   ├── admin_users/
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── urls.py
+│   ├── billing/
+│   │   ├── analytics_views.py
+│   │   ├── models.py
+│   │   └── security/
+│   │       ├── pipeline.py
+│   │       └── monitoring.py
+│   ├── expense_ai/
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── google_drive/
+│   │   ├── views.py
+│   │   └── utils.py
+│   ├── db.sqlite3
+│   ├── manage.py
+│   └── requirements.txt
+├── expense-ai-frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   └── lib/
+│   ├── package.json
+│   └── tsconfig.json
+└── README.md
+```
 
-Behavior:
+## 📸 Visual Workflow Diagram
 
-- If `NEXT_PUBLIC_API_URL` is set, the app always uses it.
-- If not set and the app is running on `localhost`/`127.0.0.1`, it uses `NEXT_PUBLIC_LOCAL_API_URL`.
-- Otherwise, it uses `NEXT_PUBLIC_REMOTE_API_URL`.
+```mermaid
+flowchart TD
+  A[Frontend User] -->|Requests expense data| B[Next.js App]
+  B -->|Calls API| C[Django Backend]
+  C -->|Reads/Writes| D[SQLite Database]
+  C -->|Integrates| E[Google Drive API]
+  C -->|Emits analytics| F[Compliance & Reporting]
+  F --> B
+```
 
-## Production build
+## 📈 Benchmarks & Performance
 
-- Backend: set production settings, use a production-ready WSGI server (Gunicorn/uvicorn + reverse proxy) and a proper RDBMS.
-- Frontend: build with `npm run build` and serve statically or via a Node process.
+- Local development with SQLite is optimized for rapid iteration and low setup overhead.
+- Production deployments should use a managed RDBMS and asynchronous worker architecture for data-heavy workloads.
+- Frontend performance is enhanced by Next.js SSR/SSG capabilities and minimal bundle size.
+- Backend API latency is primarily impacted by database performance, external API calls, and server concurrency configuration.
 
-## Environment files
+> Note: benchmark values depend on deployment environment, dataset size, and infrastructure choices.
 
-Keep secrets out of source control. Use `.env` files (already listed in `.gitignore`) or a secrets manager.
+## 🧪 Testing
 
-## Tests
-
-If tests exist, run them from each app root. Example (backend):
+### Backend tests
 
 ```powershell
 cd expense-ai-backend
+.\.venv\Scripts\Activate.ps1
 pytest
 ```
 
-## Contributing
+### Frontend tests
 
-1. Create an issue describing the change.
-2. Open a pull request against `main` with a clear description and testing steps.
+If unit or integration tests exist in `expense-ai-frontend`, run:
 
-## License
+```powershell
+cd expense-ai-frontend
+npm test
+```
 
-Add a license file to the repo (e.g., `LICENSE`) or indicate the project license here.
+### Recommended test strategy
 
----
+- Validate API endpoints with Django tests
+- Use component tests for React UI behaviour
+- Perform end-to-end checks for authentication and expense workflows
 
-If you want, I can: commit this file, add a `requirements.txt`/`package.json` checks, or expand sections with env examples. Which would you like next?
+## 📜 License
+
+This project should include a license file such as `LICENSE` to define permitted usage. If no license is present, please add one before publishing.
+
+## 🤝 Contributing
+
+Thank you for considering contributions. To contribute:
+
+1. Fork the repository or create a feature branch.
+2. Open an issue describing the enhancement or bug fix.
+3. Submit a pull request with a clear description and testing notes.
+4. Keep changes modular and document configuration updates.
+
+### Contribution expectations
+
+- Use consistent naming and code style across backend and frontend
+- Keep secrets out of source control
+- Ensure both services start and communicate in local development
+
+## 📧 Contact / Support
+
+For questions, feedback, or support, please open an issue in this repository.
+
+If you prefer direct contact, add your preferred email or Slack channel here for team collaboration.
 
