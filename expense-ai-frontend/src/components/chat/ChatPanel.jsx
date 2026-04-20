@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bot } from 'lucide-react';
+import { Bot, Maximize2, Minimize2 } from 'lucide-react';
 import { fetchHistory, getApiBaseUrl } from '../../lib/api';
 import ChatMessage from './ChatMessage';
 import ChatInput   from './ChatInput';
@@ -99,12 +99,15 @@ const BUBBLES = [
 const FAB_SIZE     = 56;
 const GAP          = 12;
 const PANEL_OFFSET = 68;
+const CHAT_MESSAGES_KEY = 'lw-chat-messages';
 
 export default function ChatPanel({ conversationId, onConversationCreate }) {
   const [open,     setOpen]     = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading,  setLoading]  = useState(false);
   const [convId,   setConvId]   = useState(conversationId || null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [messagesLoaded, setMessagesLoaded] = useState(false);
 
   // ── Draggable FAB state ────────────────────────────────────────────────
   const [headPos,     setHeadPos]     = useState({ right: 12, bottom: 28 });
@@ -120,6 +123,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
   const bottomRef    = useRef(null);
   const bubbleRef    = useRef(null);
   const panelRef     = useRef(null);
+  const lastLoadedConvIdRef = useRef(null);
   const panelSize    = useRef({ w: 380, h: 580 });
   const dragState    = useRef({
     dragging: false, moved: false,
@@ -129,11 +133,52 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
   const currentRight  = dragVisual?.right  ?? headPos.right;
   const currentBottom = dragVisual?.bottom ?? headPos.bottom;
 
-  // ── Load history when opened ───────────────────────────────────────────
+  // ── Load messages from localStorage on mount ────────────────────────────
   useEffect(() => {
-    if (open && convId) {
-      fetchHistory(convId).then(d => setMessages(d.messages || [])).catch(() => {});
+    try {
+      const stored = window.localStorage.getItem(CHAT_MESSAGES_KEY);
+      if (stored) {
+        setMessages(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error('Failed to load cached messages:', err);
     }
+    setMessagesLoaded(true);
+  }, []);
+
+  // ── Persist messages to localStorage ─────────────────────────────────────
+  useEffect(() => {
+    if (!messagesLoaded) return;
+    try {
+      if (messages.length > 0) {
+        window.localStorage.setItem(CHAT_MESSAGES_KEY, JSON.stringify(messages));
+      } else {
+        window.localStorage.removeItem(CHAT_MESSAGES_KEY);
+      }
+    } catch (err) {
+      console.error('Failed to save messages:', err);
+    }
+  }, [messages, messagesLoaded]);
+
+  // ── Load history when opened with a NEW convId ────────────────────────
+  useEffect(() => {
+    if (!open || !convId) return;
+    
+    // Only fetch if this is a new conversation ID we haven't loaded yet
+    if (lastLoadedConvIdRef.current === convId) return;
+    
+    fetchHistory(convId)
+      .then(d => {
+        // Only replace messages if server actually has messages for this conversation
+        if (d.messages && d.messages.length > 0) {
+          setMessages(d.messages);
+        }
+        lastLoadedConvIdRef.current = convId;
+      })
+      .catch(() => {
+        // On error, keep the existing messages and mark as loaded
+        lastLoadedConvIdRef.current = convId;
+      });
   }, [open, convId]);
 
   // ── Scroll to bottom ───────────────────────────────────────────────────
@@ -401,6 +446,15 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
     setLoading(false);
   };
 
+  const handleClearChat = () => {
+    setMessages([]);
+    try {
+      window.localStorage.removeItem(CHAT_MESSAGES_KEY);
+    } catch (err) {
+      console.error('Failed to clear chat from storage:', err);
+    }
+  };
+
   return (
     <>
       {/* ── Chat panel ── */}
@@ -431,11 +485,19 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
-              onClick={() => setMessages([])}
+              onClick={handleClearChat}
               title="Clear chat"
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lw-muted)', fontSize: '12px', padding: '6px' }}
             >
               Clear
+            </button>
+            <button
+              onClick={() => setFullscreen(true)}
+              title="Fullscreen"
+              aria-label="Fullscreen chat"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lw-muted)', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <Maximize2 size={16} />
             </button>
             <button
               onClick={() => setOpen(false)}
@@ -603,6 +665,155 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
         .lw-ai-icon { transition: transform .2s ease, filter .2s ease; }
         button:hover .lw-ai-icon { transform: scale(1.08) rotate(-6deg); filter: drop-shadow(0 8px 12px rgba(255,179,71,.35)); }
       `}</style>
+
+      {/* Fullscreen Modal */}
+      {fullscreen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 2000,
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+            padding: '20px',
+          }}
+          onClick={() => setFullscreen(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '900px',
+              height: '90vh',
+              background: 'var(--glass-bg-strong)',
+              border: '1px solid var(--glass-border)',
+              borderRadius: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              ...headerStyle,
+              padding: '18px 24px',
+              borderBottom: '1px solid var(--glass-border)',
+            }}>
+              <img alt="Lifewood" src={LOGO_URL} style={{ height: '28px', width: 'auto', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 700, color: 'var(--lw-text)' }}>
+                  Finance AI Assistant
+                </div>
+                <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '12px', color: 'var(--lw-green)' }}>
+                  Online · GPT-4o
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={handleClearChat}
+                  title="Clear chat"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lw-muted)', fontSize: '13px', padding: '8px 12px' }}
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => setFullscreen(false)}
+                  title="Exit fullscreen"
+                  aria-label="Exit fullscreen"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lw-muted)', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Minimize2 size={18} />
+                </button>
+                <button
+                  onClick={() => { setFullscreen(false); setOpen(false); }}
+                  aria-label="Close chat"
+                  style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lw-dark)', cursor: 'pointer', fontSize: '18px' }}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Messages Area */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {messages.length === 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '12px', justifyContent: 'center', alignItems: 'center', minHeight: '100%' }}>
+                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                    <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '15px', color: 'var(--lw-muted)', lineHeight: 1.8 }}>
+                      Ask about your finances, export to Excel,<br />
+                      or <strong style={{ color: 'var(--lw-accent-deep)' }}>📎 attach a receipt</strong> to scan &amp; upload it
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', maxWidth: '600px', width: '100%' }}>
+                    {SUGGESTIONS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => handleSend(s)}
+                        style={{
+                          background: 'var(--lw-sea-salt)',
+                          border: '1px solid var(--lw-border)',
+                          borderRadius: '12px',
+                          padding: '12px 16px',
+                          color: 'var(--lw-text)',
+                          fontFamily: "'Manrope', sans-serif",
+                          fontSize: '13px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          lineHeight: 1.5,
+                          transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--lw-accent)'; e.currentTarget.style.background = 'rgba(255,179,71,0.05)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--lw-border)'; e.currentTarget.style.background = 'var(--lw-sea-salt)'; }}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {messages.map((m) => (
+                <ChatMessage
+                  key={m.id}
+                  role={m.role}
+                  content={m.content}
+                  timestamp={m.timestamp}
+                  error={m.error}
+                  receipts={m.receipts || []}
+                  metadata={m.metadata || {}}
+                />
+              ))}
+
+              {loading && (
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <div style={{ ...msgBubble('agent'), display: 'flex', gap: '4px', padding: '14px 18px' }}>
+                    {[0, 1, 2].map(i => (
+                      <div key={i} style={{
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        background: 'var(--lw-accent-deep)',
+                        animation: `bounce 1.2s ${i * 0.2}s infinite`,
+                      }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
+            </div>
+
+            {/* Chat Input */}
+            <div style={{ borderTop: '1px solid var(--glass-border)', padding: '18px 24px', background: 'rgba(255, 255, 255, 0.3)' }}>
+              <ChatInput onSend={handleSend} onStop={handleStop} isSending={loading} disabled={loading} />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

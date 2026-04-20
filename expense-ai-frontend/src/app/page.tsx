@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, Shield, User } from 'lucide-react';
+import { Lock, Shield, User, Eye, EyeOff } from 'lucide-react';
 import styles from './page.module.css';
 import { getApiBaseUrl } from '../lib/api';
 import { getStoredSession, storeSession, type UserSession } from '../lib/auth';
@@ -17,6 +17,7 @@ export default function HomePage() {
   const [error,     setError]     = useState('');
   const [loading,   setLoading]   = useState(false);
   const [checking,  setChecking]  = useState(true); // initial session check
+  const [showPassword, setShowPassword] = useState(false);
 
   // ── If already logged in, skip straight to /drive ────────────────────────
   useEffect(() => {
@@ -98,68 +99,83 @@ export default function HomePage() {
         </aside>
 
         <div className={styles.formPanel} aria-label="Sign in">
-          <header className={styles.formHeader}>
-            <img alt="Lifewood" className={styles.formLogo} src={LOGO_URL} />
-            <h1 className={styles.formTitle}>Welcome</h1>
-            <p className={styles.formSubtitle}>
-              Sign in to your Lifewood Finance account.
-            </p>
-          </header>
+          <div className={styles.loginContainer}>
+            <header className={styles.formHeader}>
+              <img alt="Lifewood" className={styles.formLogo} src={LOGO_URL} />
+              <h1 className={styles.formTitle}>Welcome</h1>
+              <p className={styles.formSubtitle}>
+                Sign in to your Lifewood Finance account.
+              </p>
+            </header>
 
-          <form className={styles.loginForm} onSubmit={handleLogin}>
-            <label className={styles.field}>
-              <span className={styles.labelText}>Username</span>
-              <div className={styles.inputWrap}>
-                <User className={styles.inputIcon} size={18} aria-hidden="true" />
-                <input
-                  autoCapitalize="none"
-                  autoComplete="username"
-                  autoCorrect="off"
-                  className={styles.input}
+            <form className={styles.loginForm} onSubmit={handleLogin}>
+              <label className={styles.field}>
+                <span className={styles.labelText}>Username</span>
+                <div className={styles.inputWrap}>
+                  <User className={styles.inputIcon} size={18} aria-hidden="true" />
+                  <input
+                    autoCapitalize="none"
+                    autoComplete="username"
+                    autoCorrect="off"
+                    className={styles.input}
+                    disabled={loading}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (error) setError('');
+                    }}
+                    placeholder="Enter username"
+                    spellCheck="false"
+                    type="text"
+                    value={username}
+                  />
+                </div>
+              </label>
+
+              <label className={styles.field}>
+                <span className={styles.labelText}>Password</span>
+                <div className={styles.inputWrap}>
+                  <Lock className={styles.inputIcon} size={18} aria-hidden="true" />
+                  <input
+                    autoComplete="current-password"
+                    className={styles.input}
+                    disabled={loading}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError('');
+                    }}
+                    placeholder="Enter password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                  />
+                  <button
+                    type="button"
+                    className={styles.togglePasswordBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeOff className={styles.togglePasswordIcon} size={18} aria-hidden="true" />
+                    ) : (
+                      <Eye className={styles.togglePasswordIcon} size={18} aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              </label>
+
+              {error ? <p className={styles.error}>{error}</p> : null}
+
+              <div className={styles.actions}>
+                <button
+                  className={styles.primaryButton}
                   disabled={loading}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    if (error) setError('');
-                  }}
-                  placeholder="Enter username"
-                  spellCheck="false"
-                  type="text"
-                  value={username}
-                />
+                  type="submit"
+                >
+                  {loading ? 'Signing in…' : 'Sign In'}
+                </button>
               </div>
-            </label>
-
-            <label className={styles.field}>
-              <span className={styles.labelText}>Password</span>
-              <div className={styles.inputWrap}>
-                <Lock className={styles.inputIcon} size={18} aria-hidden="true" />
-                <input
-                  autoComplete="current-password"
-                  className={styles.input}
-                  disabled={loading}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (error) setError('');
-                  }}
-                  placeholder="Enter password"
-                  type="password"
-                  value={password}
-                />
-              </div>
-            </label>
-
-            {error ? <p className={styles.error}>{error}</p> : null}
-
-            <div className={styles.actions}>
-              <button
-                className={styles.primaryButton}
-                disabled={loading}
-                type="submit"
-              >
-                {loading ? 'Signing in…' : 'Sign In'}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </section>
     </main>

@@ -76,6 +76,14 @@ export function useProfile() {
         credentials: 'include',
       }).catch(() => {});
       clearSession();
+      
+      // Clear chat messages on sign out
+      try {
+        window.localStorage.removeItem('lw-chat-messages');
+      } catch (err) {
+        console.error('Failed to clear chat messages on sign out:', err);
+      }
+      
       return true;
     } catch (e) {
       console.error('Sign out failed:', e);
