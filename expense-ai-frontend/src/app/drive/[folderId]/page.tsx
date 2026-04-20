@@ -4,6 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { driveService } from '../../../services/driveService';
 import { getStoredSession } from '../../../lib/auth';
+import { usePageState } from '../../../lib/PageStateContext';
 import styles from '../page.module.css';
 
 type DriveItem = {
@@ -101,6 +102,7 @@ function removeItemFromTree(items: DriveItem[], itemId: string): DriveItem[] {
 export default function FolderWorkspacePage() {
   const { folderId } = useParams<{ folderId: string }>();
   const router = useRouter();
+  const { setIsLoading, setIsError } = usePageState();
 
   const [folders, setFolders] = useState<DriveItem[]>([]);
   const [searchInput, setSearchInput] = useState('');
@@ -115,17 +117,21 @@ export default function FolderWorkspacePage() {
 
   async function fetchFiles() {
     try {
+      setIsLoading(true);
       const data = await driveService.listFiles();
       setFolders(data);
       setError(null);
       setUploadError(null);
+      setIsError(false);
       return data;
     } catch (err) {
       setError('Failed to load scanned Google Drive folders.');
+      setIsError(true);
       console.error(err);
       return null;
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -136,7 +142,7 @@ export default function FolderWorkspacePage() {
       return;
     }
     fetchFiles();
-  }, [router]);
+  }, [router, setIsLoading, setIsError]);
 
   const selectedFolder = findItemById(folders, folderId) ?? null;
   const selectedContents = useMemo(() => {

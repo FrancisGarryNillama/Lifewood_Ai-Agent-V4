@@ -9,6 +9,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { driveService } from '../../services/driveService';
 import { getStoredSession } from '../../lib/auth';
+import { usePageState } from '../../lib/PageStateContext';
 import UserProfileMenu from '../../components/common/UserProfileMenu';
 import styles from './page.module.css';
 
@@ -83,6 +84,7 @@ function countItems(item: DriveItem): number {
 
 export default function DrivePage() {
   const router = useRouter();
+  const { setIsLoading, setIsError } = usePageState();
   const [folders,          setFolders]          = useState<DriveItem[]>([]);
   const [viewMode,         setViewMode]          = useState<'tiles' | 'content'>('tiles');
   const [searchInput,      setSearchInput]       = useState('');
@@ -115,19 +117,23 @@ export default function DrivePage() {
 
     const fetchFiles = async () => {
       try {
+        setIsLoading(true);
         const data = await driveService.listFiles();
         setFolders(data);
         setError(null);
+        setIsError(false);
       } catch (err) {
         setError('Failed to load scanned Google Drive folders.');
+        setIsError(true);
         console.error(err);
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchFiles();
-  }, [router]);
+  }, [router, setIsLoading, setIsError]);
 
   const stats = summarizeTree(folders);
   const latestModified = useMemo(() => getLatestModified(folders), [folders]);

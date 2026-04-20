@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import ChatPanel from './ChatPanel';
+import { usePageState } from '../../lib/PageStateContext';
 
 export default function SharedChatbot() {
   const [convId, setConvId] = useState(null);
   const pathname = usePathname();
+  const { isLoading, isError } = usePageState();
 
-  if (pathname === '/') {
+  if (pathname === '/' || isLoading || isError) {
     return null;
   }
 
