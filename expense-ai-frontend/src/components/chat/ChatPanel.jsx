@@ -6,7 +6,7 @@ import { fetchHistory, getApiBaseUrl } from '../../lib/api';
 import ChatMessage from './ChatMessage';
 import ChatInput   from './ChatInput';
 
-const LOGO_URL  = 'https://framerusercontent.com/images/BZSiFYgRc4wDUAuEybhJbZsIBQY.png?width=1519&height=429';
+const LOGO_URL  = '/fainance-logo.png';
 
 const fabStyle = (open) => ({
   position: 'fixed',
@@ -117,6 +117,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
   const [bubbleIndex, setBubbleIndex] = useState(0);
   const [bubbleAnim,  setBubbleAnim]  = useState('bubble-in');
   const [bubbleSide,  setBubbleSide]  = useState('right');
+  const showPanel = open && !fullscreen;
 
   const abortRef     = useRef(null);
   const requestIdRef = useRef(0);
@@ -458,6 +459,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
   return (
     <>
       {/* ── Chat panel ── */}
+      {showPanel && (
       <div
         ref={panelRef}
         style={{
@@ -475,14 +477,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
         {/* Header */}
         <div style={headerStyle}>
           <img alt="Lifewood" src={LOGO_URL} style={{ height: '26px', width: 'auto', flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '14px', fontWeight: 700, color: 'var(--lw-text)' }}>
-              Finance AI
-            </div>
-            <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '11px', color: 'var(--lw-green)' }}>
-              Online · GPT-4o
-            </div>
-          </div>
+          <div style={{ flex: 1 }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button
               onClick={handleClearChat}
@@ -577,6 +572,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
 
         <ChatInput onSend={handleSend} onStop={handleStop} isSending={loading} disabled={loading} />
       </div>
+      )}
 
       {/* ── Draggable FAB ── */}
       <button
@@ -707,14 +703,7 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
               borderBottom: '1px solid var(--glass-border)',
             }}>
               <img alt="Lifewood" src={LOGO_URL} style={{ height: '28px', width: 'auto', flexShrink: 0 }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '16px', fontWeight: 700, color: 'var(--lw-text)' }}>
-                  Finance AI Assistant
-                </div>
-                <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: '12px', color: 'var(--lw-green)' }}>
-                  Online · GPT-4o
-                </div>
-              </div>
+              <div style={{ flex: 1 }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   onClick={handleClearChat}
@@ -817,3 +806,4 @@ export default function ChatPanel({ conversationId, onConversationCreate }) {
     </>
   );
 }
+
