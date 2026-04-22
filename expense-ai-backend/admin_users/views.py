@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from .models import AdminUserProfile
+from .predefined_users import ensure_predefined_user
 
 logger = logging.getLogger('admin_users')
 
@@ -61,6 +62,13 @@ def login_view(request):
         return JsonResponse({'error': 'Username and password are required'}, status=400)
 
     user = authenticate(request, username=username, password=password)
+
+    if user is None:
+        ensured_user, created = ensure_predefined_user(username)
+        if ensured_user is not None:
+            if created:
+                logger.info('Provisioned missing predefined user during login: %s', username)
+            user = authenticate(request, username=username, password=password)
 
     if user is None:
         logger.warning('Failed login attempt for username: %s', username)
