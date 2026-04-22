@@ -68,6 +68,7 @@ export default function RecentReceipts({ receipts, loading }) {
   const [page, setPage]         = useState(1);
 
   const handleSort = (key) => {
+    setPage(1);
     if (key === sortKey) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortKey(key); setSortDir('desc'); }
   };

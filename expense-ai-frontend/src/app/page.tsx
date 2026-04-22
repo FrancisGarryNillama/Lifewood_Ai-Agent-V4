@@ -85,6 +85,9 @@ export default function HomePage() {
         <aside className={styles.brandPanel} aria-label="Brand">
           <div className={styles.brandInner}>
             <div className={styles.brandText}>
+              <div className={styles.brandCornerBadge} aria-hidden="true">
+                <img src="/apple-touch-icon.png" alt="" />
+              </div>
               <div className={styles.brandProductLogoWrap}>
                 <img 
                   src="fainance-logo.png" 
@@ -93,7 +96,7 @@ export default function HomePage() {
                   style={{ width: '100%', height: 'auto', maxWidth: '380px' }}
                 />
               </div>
-              <p className={styles.brandSubtitle}>Finance Workspace</p>
+              <p className={styles.brandSubtitle}>Finance AI Intillegence Assitant</p>
             </div>
           </div>
         </aside>
