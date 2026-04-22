@@ -111,13 +111,13 @@ export default function ChatInput({
     return () => { recognitionRef.current?.abort(); };
   }, []);
 
-  // ── Check browser support once ───────────────────────────────────────────
+
+  // ── Start voice recognition ───────────────────────────────────────────────
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) setMicState(MIC_STATES.UNSUPPORTED);
   }, []);
 
-  // ── Start voice recognition ───────────────────────────────────────────────
   const startListening = useCallback(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { setMicState(MIC_STATES.UNSUPPORTED); return; }
@@ -311,7 +311,7 @@ export default function ChatInput({
               whiteSpace: 'nowrap',
               maxWidth: '200px',
             }}>
-              "{interimText}"
+              &quot;{interimText}&quot;
             </span>
           )}
           <span style={{
@@ -552,3 +552,4 @@ export default function ChatInput({
     </div>
   );
 }
+

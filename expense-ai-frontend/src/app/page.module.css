@@ -32,6 +32,58 @@
   color: rgba(255, 255, 255, 0.94);
 }
 
+.brandCornerBadge {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  z-index: 2;
+  width: clamp(40px, 5vw, 72px);
+  height: clamp(40px, 5vw, 72px);
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0 auto clamp(0px, 0.5vw, 4px);
+  margin-top: 4px;
+  justify-self: center;
+}
+
+.brandCornerBadge img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  transform-origin: center;
+  animation: brandBadgePulse 3.4s ease-in-out infinite;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes loginFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-8px) scale(1.006);
+  }
+}
+
+@keyframes brandBadgePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.94;
+    filter: drop-shadow(0 0 0 rgba(255, 179, 71, 0));
+  }
+
+  50% {
+    transform: scale(1.09);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(255, 179, 71, 0.14));
+  }
+}
+
 .brandPanel::before {
   content: "";
   position: absolute;
@@ -51,7 +103,8 @@
   justify-items: center;
   text-align: center;
   align-self: center;
-  max-width: 520px;
+  width: 100%;
+  max-width: clamp(280px, 38vw, 520px);
   margin: 0 auto;
   padding: clamp(10px, 2vw, 18px);
   border-radius: 0;
@@ -60,6 +113,7 @@
   box-shadow: none;
   backdrop-filter: none;
   z-index: 1;
+  transform: translateY(clamp(-26px, -3.2vh, -12px));
 }
 
 .brandLogo {
@@ -72,6 +126,7 @@
 .brandText {
   display: grid;
   gap: 10px;
+  justify-items: center;
 }
 
 .brandProductLogoWrap {
@@ -80,32 +135,47 @@
   display: grid;
   justify-items: center;
   padding: 12px 14px;
+  z-index: 1;
+  overflow: hidden;
+  isolation: isolate;
 }
 
-.brandProductLogoWrap::before {
+.brandProductLogoWrap::after {
   content: "";
   position: absolute;
-  inset: -6px 0 -10px;
-  z-index: 0;
-  border-radius: 22px;
+  inset: 0;
+  z-index: 2;
   background:
-    radial-gradient(ellipse 60% 60% at 50% 45%, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0.22) 52%, rgba(0, 0, 0, 0.0) 100%),
-    radial-gradient(ellipse 55% 55% at 50% 55%, rgba(255, 179, 71, 0.12) 0%, transparent 60%);
-  filter: blur(0.2px);
-}
-
-.brandProductLogo {
-  /* removed for text logo replacement */
+    linear-gradient(115deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.00) 44%,
+      rgba(255, 255, 255, 0.20) 48%,
+      rgba(255, 255, 255, 0.88) 50%,
+      rgba(255, 255, 255, 0.24) 52%,
+      rgba(255, 255, 255, 0.00) 56%,
+      transparent 62%);
+  mix-blend-mode: screen;
+  filter: blur(0.6px);
+  opacity: 0.66;
+  transform: translateX(-150%) rotate(18deg);
+  animation: brandShineSweep 5s linear infinite;
+  pointer-events: none;
 }
 
 .fainanceLogo {
+  position: relative;
   display: flex;
   flex-direction: row;
   font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
   font-weight: 900;
-  font-size: 3.4rem;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
   letter-spacing: 0.01em;
-  text-shadow: none;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.10),
+    0 2px 0 rgba(0, 0, 0, 0.05);
+  filter:
+    saturate(1.06)
+    contrast(1.04);
   align-items: flex-end;
   justify-content: center;
   z-index: 1;
@@ -139,13 +209,63 @@
 
 
 .brandSubtitle {
+  position: relative;
   margin: 0;
-  font-size: 0.92rem;
+  font-size: clamp(0.74rem, 1.1vw, 0.92rem);
   font-weight: 800;
-  letter-spacing: 0.14em;
+  letter-spacing: clamp(0.08em, 0.45vw, 0.14em);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.74);
-  text-shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
+  z-index: 1;
+  overflow: hidden;
+  isolation: isolate;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+.brandSubtitle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(115deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.00) 44%,
+      rgba(255, 255, 255, 0.20) 48%,
+      rgba(255, 255, 255, 0.88) 50%,
+      rgba(255, 255, 255, 0.24) 52%,
+      rgba(255, 255, 255, 0.00) 56%,
+      transparent 62%);
+  mix-blend-mode: screen;
+  filter: blur(0.6px);
+  opacity: 0.66;
+  transform: translateX(-150%) rotate(18deg);
+  animation: brandShineSweep 5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes brandShineSweep {
+  0%,
+  42% {
+    transform: translateX(-150%) rotate(18deg);
+    opacity: 0;
+  }
+
+  52% {
+    opacity: 0.68;
+  }
+
+  76% {
+    transform: translateX(150%) rotate(18deg);
+    opacity: 0.62;
+  }
+
+  100% {
+    transform: translateX(150%) rotate(18deg);
+    opacity: 0;
+  }
 }
 
 .formPanel {
@@ -173,10 +293,13 @@
   border: 1px solid rgba(4, 98, 65, 0.15);
   border-radius: 24px;
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.06),
-    0 12px 32px rgba(4, 98, 65, 0.12),
+    0 8px 18px rgba(0, 0, 0, 0.08),
+    0 18px 42px rgba(4, 98, 65, 0.16),
+    0 30px 70px rgba(0, 0, 0, 0.10),
     inset 0 0 1px rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
+  animation: loginFloat 5s ease-in-out infinite;
+  will-change: transform;
 }
 
 .formHeader {
@@ -358,7 +481,8 @@
   }
 
   .brandInner {
-    max-width: 400px;
+    max-width: clamp(260px, 42vw, 400px);
+    transform: translateY(clamp(-30px, -3.6vh, -14px));
   }
 
   .formPanel {
@@ -389,7 +513,8 @@
   }
 
   .brandInner {
-    max-width: 350px;
+    max-width: clamp(240px, 44vw, 350px);
+    transform: translateY(clamp(-34px, -4vh, -16px));
   }
 
   .brandSubtitle {
@@ -449,8 +574,9 @@
   }
 
   .brandInner {
-    max-width: 280px;
+    max-width: clamp(220px, 46vw, 280px);
     padding: clamp(8px, 1.5vw, 14px);
+    transform: translateY(clamp(-38px, -4.8vh, -18px));
   }
 
   .brandSubtitle {
@@ -539,6 +665,151 @@
   }
 }
 
+@media (max-width: 430px) {
+  .brandPanel {
+    padding: 20px 14px;
+    min-height: 22vh;
+    min-height: 22dvh;
+  }
+
+  .brandInner {
+    max-width: min(100%, 240px);
+    gap: 12px;
+    padding: 8px 10px;
+    transform: translateY(clamp(-42px, -5.2vh, -20px));
+  }
+
+  .brandProductLogoWrap {
+    padding: 6px 8px;
+  }
+
+  .brandSubtitle {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .formPanel {
+    padding: 20px 14px;
+  }
+
+  .loginContainer {
+    max-width: 100%;
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .brandPanel {
+    padding: 16px 12px;
+    min-height: 21vh;
+    min-height: 21dvh;
+  }
+
+  .brandInner {
+    max-width: min(100%, 220px);
+    gap: 8px;
+    padding: 6px 8px;
+    transform: translateY(clamp(-46px, -5.6vh, -22px));
+  }
+
+  .brandProductLogoWrap {
+    padding: 4px 6px;
+  }
+
+  .fainanceLogo {
+    font-size: clamp(1.7rem, 11vw, 2.05rem);
+  }
+
+  .brandSubtitle {
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+  }
+
+  .formPanel {
+    padding: 18px 12px;
+  }
+
+  .loginContainer {
+    gap: 18px;
+    padding: 18px;
+  }
+}
+
+@media (min-width: 431px) and (max-width: 600px) {
+  .brandPanel {
+    padding: 22px 16px;
+    min-height: 24vh;
+    min-height: 24dvh;
+  }
+
+  .brandInner {
+    max-width: min(100%, 280px);
+    gap: 14px;
+    padding: 8px 12px;
+    transform: translateY(clamp(-40px, -5vh, -18px));
+  }
+
+  .brandProductLogoWrap {
+    padding: 8px 10px;
+  }
+
+  .brandSubtitle {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+  }
+
+  .formPanel {
+    padding: 22px 16px;
+  }
+
+  .loginContainer {
+    max-width: 100%;
+    gap: 22px;
+    padding: 22px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) and (orientation: portrait) {
+  .brandPanel {
+    padding: 30px 22px;
+    min-height: 32vh;
+    min-height: 32dvh;
+  }
+
+  .brandInner {
+    max-width: min(100%, 420px);
+    gap: 16px;
+    padding: 10px 14px;
+    transform: translateY(clamp(-30px, -3.8vh, -14px));
+  }
+
+  .brandSubtitle {
+    font-size: 0.84rem;
+    letter-spacing: 0.12em;
+  }
+
+  .formPanel {
+    padding: 30px 22px;
+  }
+
+  .loginContainer {
+    max-width: clamp(280px, 88%, 420px);
+    padding: 30px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1200px) {
+  .brandPanel {
+    padding: 34px 28px;
+  }
+
+  .brandInner {
+    max-width: min(100%, 460px);
+    transform: translateY(clamp(-22px, -3vh, -10px));
+  }
+}
+
 @media (max-height: 600px) {
   .brandPanel {
     min-height: 20vh;
@@ -546,6 +817,7 @@
 
   .brandInner {
     padding: clamp(6px, 1vw, 10px);
+    transform: translateY(clamp(-28px, -3.5vh, -12px));
   }
 
   .formPanel {
@@ -605,5 +877,27 @@
   .primaryButton {
     min-height: 40px;
     font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loginContainer {
+    animation: none;
+  }
+
+  .brandCornerBadge img {
+    animation: none;
+  }
+
+  .brandProductLogoWrap::after {
+    animation: none;
+    opacity: 0.35;
+    transform: translateX(0) rotate(18deg);
+  }
+
+  .brandSubtitle::after {
+    animation: none;
+    opacity: 0.35;
+    transform: translateX(0) rotate(18deg);
   }
 }
