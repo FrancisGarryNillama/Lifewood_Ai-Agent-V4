@@ -59,6 +59,7 @@ DJANGO_SECRET_KEY=change-me
 DEBUG=True
 DATABASE_URL=sqlite:///db.sqlite3
 GOOGLE_OAUTH_CREDENTIALS=expense_ai/credentials.json
+OPENAI_API_KEY=your_key_here
 ```
 
 Run database migrations:

@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -114,7 +115,16 @@ WSGI_APPLICATION = 'expense_ai.wsgi.application'
 # Database — uses Postgres on Railway via DATABASE_URL, falls back to SQLite locally
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
-    DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+    db_config = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    host = (db_config.get('HOST') or '').strip()
+    if host and '.' not in host and host not in ('localhost', '127.0.0.1'):
+        raise ImproperlyConfigured(
+            "Invalid DATABASE_URL: database host looks incomplete "
+            f"({host!r}). On Render, set DATABASE_URL to the full value from "
+            "your Postgres instance (External Database URL / Internal Database URL), "
+            "including the full hostname."
+        )
+    DATABASES = {'default': db_config}
 else:
     DATABASES = {
         'default': {
